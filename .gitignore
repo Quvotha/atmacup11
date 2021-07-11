@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+######### Quvotha setting #########
+# Competition dataset
+dataset_atmaCup11/
