@@ -131,3 +131,5 @@ dmypy.json
 ######### Quvotha setting #########
 # Competition dataset
 dataset_atmaCup11/
+# Experiment output files
+experiments/*/
