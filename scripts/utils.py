@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 
 def should_stop_earlier(metrics, *, patience: int = 10, min_delta: float = 1e-4,
                         greater_is_better: bool = False) -> bool:
@@ -24,4 +26,18 @@ def should_stop_earlier(metrics, *, patience: int = 10, min_delta: float = 1e-4,
     Early stipping signal: bool
         Return True if training should be stopped, otherwise False.
     """
-    raise NotImplemented
+    if not (isinstance(min_delta, float) and min_delta >= 0.):
+        raise ValueError('`min_delta` shuold be float >= 0.0 but {} given'
+                         .format(min_delta))
+    if not (isinstance(patience, int) and patience > 1):
+        raise ValueError('`patience` shuold be integer >= 2 but {} given'
+                         .format(patience))
+    if len(metrics) < patience:
+        return False
+    sign = 1 if greater_is_better else -1
+    improvement_quantities = [sign * (metrics[i + 1] - metrics[i]) for i in range(len(metrics) - 1)]
+    max_improvement_quantity = max(improvement_quantities[-patience:])
+    max_improvement_quantity_decimal = Decimal(max_improvement_quantity) \
+        .quantize(Decimal(str(min_delta)))
+    min_delta_decimal = Decimal(min_delta).quantize(Decimal(str(min_delta)))
+    return max_improvement_quantity_decimal <= min_delta_decimal
