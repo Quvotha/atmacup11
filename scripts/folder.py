@@ -9,6 +9,8 @@ class Folder:
     PHOTO: Final[str] = os.path.join(CSV, 'images')
     # Where experiments result are stored
     EXPERIMENTS: Final[str] = os.path.join(os.path.dirname(__file__), '..', 'experiments')
+    # Where fold indice are stored
+    FOLD: Final[str] = os.path.join(os.path.dirname(__file__), '..', 'fold')
 
 
 def experiment_dir_of(exp_no: int):
