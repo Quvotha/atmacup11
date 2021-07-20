@@ -1,4 +1,4 @@
-from typing import Final, List
+from typing import List
 import unittest
 
 from utils import should_stop_earlier
@@ -6,8 +6,8 @@ from utils import should_stop_earlier
 
 class TestShouldStopEarly(unittest.TestCase):
 
-    LOSSES: Final[List[float]] = [1., 0.8, 0.6, 0.55, 0.5, 0.45]
-    SCORES: Final[List[float]] = [0., 0.2, 0.4, 0.45, 0.5, 0.55]
+    LOSSES: List[float] = [1., 0.8, 0.6, 0.55, 0.5, 0.45]
+    SCORES: List[float] = [0., 0.2, 0.4, 0.45, 0.5, 0.55]
 
     def test_loss_improve(self):
         output = should_stop_earlier(

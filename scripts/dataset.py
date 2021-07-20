@@ -1,20 +1,19 @@
 from functools import lru_cache
 import os
-from typing import Final, Optional, Tuple, Iterable, Union
+from typing import Optional, Tuple, Iterable, Union
 
 import numpy as np
 import pandas as pd
 from PIL import Image, JpegImagePlugin
 import torch
-import torch.nn as nn
 from torch.utils.data import Dataset
 from torchvision import transforms as T
 
 from folder import Folder
 
-IMAGE_WIDTH: Final[int] = 224
-IMAGE_HEIGHT: Final[int] = 224
-IMAGE_NUM_CHANNELS: Final[int] = 3
+IMAGE_WIDTH: int = 224
+IMAGE_HEIGHT: int = 224
+IMAGE_NUM_CHANNELS: int = 3
 
 
 def load_csvfiles(csv_directory: str = Folder.CSV) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame,
