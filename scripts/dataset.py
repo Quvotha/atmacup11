@@ -1,10 +1,11 @@
 from functools import lru_cache
 import os
-from typing import Final, Optional, Tuple, Iterable
+from typing import Final, Optional, Tuple, Iterable, Union
 
 import numpy as np
 import pandas as pd
-from PIL import Image
+from PIL import Image, JpegImagePlugin
+import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
 from torchvision import transforms as T
@@ -45,7 +46,8 @@ def _id2filename(object_id: str) -> str:
 
 @lru_cache(maxsize=1024)
 def load_photofile(object_id: str, photo_directory: str = Folder.PHOTO,
-                   resize_to: Optional[Tuple[int, int]] = (IMAGE_WIDTH, IMAGE_HEIGHT)) -> np.ndarray:
+                   resize_to: Optional[Tuple[int, int]] = (IMAGE_WIDTH, IMAGE_HEIGHT),
+                   return_ndarray: bool = True) -> Union[np.ndarray, JpegImagePlugin.JpegImageFile]:
     """Load 1 jpg image of given object_id.
 
     Parameters
@@ -57,6 +59,8 @@ def load_photofile(object_id: str, photo_directory: str = Folder.PHOTO,
     resize_to : Optional[Tuple[int, int]], optional
         Image data is to be resized after loaded if `resize_to` is given.
         Should be given in (width, height) style. If None is given, resize is not to be applied.
+    return_ndarray : bool
+        Return np.ndarry if True. Otherwise return JpegImagePlugin.JpegImageFile.
 
     Returns
     -------
@@ -67,7 +71,7 @@ def load_photofile(object_id: str, photo_directory: str = Folder.PHOTO,
     image = Image.open(filepath)
     if resize_to is not None:
         image = image.resize(resize_to)
-    return np.array(image)
+    return np.array(image) if return_ndarray else image
 
 
 def load_photofiles(object_ids, photo_directory: str = Folder.PHOTO,
@@ -128,3 +132,45 @@ class AtmaImageDatasetV01(Dataset):
 
     def __len__(self):
         return len(self.object_ids)
+
+
+class AtmaImageDatasetV02(Dataset):
+
+    def __init__(self, object_ids: Iterable[str], transformers,
+                 labels: Optional[Iterable[int]] = None):
+        """Competition's image data and label.
+
+        Parameters
+        ----------
+        object_ids : Iterable[str]
+            `object_id`
+        transformers : [type]
+            Transformer object which will be applied to image data.
+        labels : Optional[Iterable[int]]
+            `target` (training and validation set) or `None` (test set).
+        """
+        self.object_ids = np.array(object_ids)
+        self.labels = None if labels is None else np.array(labels)
+        if self.labels is not None and len(self.object_ids) != len(self.labels):
+            raise ValueError('`object_ids` and `images` should be same length ({}, {})'
+                             .format(len(self.object_ids), len(self.labels)))
+        self.transformers = transformers
+
+    def __getitem__(self, index) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
+        object_id = self.object_ids[index]
+        # if not isinstance(object_ids, np.ndarray):
+        #     object_ids = np.array([object_ids, ])
+        image = load_photofile(object_id, return_ndarray=False, resize_to=None)
+        image = self.transform_image(image)
+        if self.labels is None:
+            return image
+        else:
+            label = self.labels[index]
+            label = torch.tensor(label).float()
+            return image, label
+
+    def __len__(self):
+        return len(self.object_ids)
+
+    def transform_image(self, image: JpegImagePlugin) -> torch.Tensor:
+        return image if self.transformers is None else self.transformers(image)
