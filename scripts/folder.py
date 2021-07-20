@@ -1,16 +1,15 @@
 import os
-from typing import Final
 
 
 class Folder:
     # Where csv files are stored
-    CSV: Final[str] = os.path.join(os.path.dirname(__file__), '..', 'dataset_atmaCup11')
+    CSV: str = os.path.join(os.path.dirname(__file__), '..', 'dataset_atmaCup11')
     # Where image files are stored
-    PHOTO: Final[str] = os.path.join(CSV, 'images')
+    PHOTO: str = os.path.join(CSV, 'images')
     # Where experiments result are stored
-    EXPERIMENTS: Final[str] = os.path.join(os.path.dirname(__file__), '..', 'experiments')
+    EXPERIMENTS: str = os.path.join(os.path.dirname(__file__), '..', 'experiments')
     # Where fold indice are stored
-    FOLD: Final[str] = os.path.join(os.path.dirname(__file__), '..', 'fold')
+    FOLD: str = os.path.join(os.path.dirname(__file__), '..', 'fold')
 
 
 def experiment_dir_of(exp_no: int):
