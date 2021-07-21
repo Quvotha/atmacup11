@@ -101,7 +101,7 @@ def initialize_model(model_name: str, num_classes: int = 1) -> tuple:
     model_name : str
         Should be one of 'resnet', 'alexnet', 'vgg', 'squeezenet', 'densenet', 'inception'.
     num_classes : int, optional
-        [description], by default 1
+        Length of output layer, by default 1
 
     Returns
     -------
