@@ -12,10 +12,12 @@ class Folder:
     FOLD: str = os.path.join(os.path.dirname(__file__), '..', 'fold')
 
 
-def experiment_dir_of(exp_no: int):
+def experiment_dir_of(exp_no: int, auto_make: bool = True):
     if not isinstance(exp_no, int) or exp_no < 0:
         raise ValueError(f'`exp` should be positive integer but {exp_no} given')
     directory = os.path.join(Folder.EXPERIMENTS, f'exp{str(exp_no).zfill(3)}')
+    if not auto_make:
+        return directory
     if os.path.isdir(directory):
         raise ValueError(f'{directory} already exists')
     os.makedirs(directory)
